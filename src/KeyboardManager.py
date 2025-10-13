@@ -111,7 +111,6 @@ def refresh_panel():
 
 # PLUGIN:
 def create_keyboard_plugin():
-    global xfce4_panel
     # Add keyboard
     subprocess.call(["xfce4-panel", "--add=xkb"])
 
@@ -130,8 +129,6 @@ def create_keyboard_plugin():
 
 
 def remove_keyboard_plugin():
-    global xfce4_panel
-
     keyboard_plugin = PanelManager.find_plugin("xkb")
     if not keyboard_plugin:
         return
@@ -150,7 +147,6 @@ def remove_keyboard_plugin():
 
 
 def set_keyboard_plugin_place(keyboard_plugin):
-    global xfce4_panel
     if not keyboard_plugin:
         return
 
