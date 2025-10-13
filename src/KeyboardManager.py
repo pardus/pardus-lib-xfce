@@ -1,7 +1,7 @@
 import subprocess
 import gi
 
-import PanelManager
+import pardus_lib_xfce.PanelManager as PanelManager
 
 gi.require_version("Xfconf", "0")
 from gi.repository import Xfconf
