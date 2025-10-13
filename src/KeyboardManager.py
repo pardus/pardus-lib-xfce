@@ -1,18 +1,13 @@
 import subprocess
-import os
-import xml.etree.ElementTree as ET
 import gi
+
+import PanelManager
 
 gi.require_version("Xfconf", "0")
 from gi.repository import Xfconf
 
 keyboard_layout = Xfconf.Channel.new("keyboard-layout")
 xfce4_panel = Xfconf.Channel.new("xfce4-panel")
-
-HOME_PATH = os.environ.get("HOME", None)
-XFCE4_PANEL_XML = (
-    f"{HOME_PATH}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"
-)
 
 
 def init():
@@ -35,6 +30,7 @@ def get_layouts():
     # Result => ["tr-", "tr-f", "us-"]
     layouts = layouts.split(",")
     variants = variants.split(",")
+
     result = [f"{a}-{b}" for a, b in zip(layouts, variants)]
 
     return result
@@ -118,7 +114,7 @@ def create_keyboard_plugin():
     # Add keyboard
     subprocess.call(["xfce4-panel", "--add=xkb"])
 
-    keyboard_plugin = get_keyboard_plugin()
+    keyboard_plugin = PanelManager.find_plugin("xkb")
     if keyboard_plugin:
         set_keyboard_plugin_place(keyboard_plugin)
 
@@ -135,13 +131,13 @@ def create_keyboard_plugin():
 def remove_keyboard_plugin():
     global xfce4_panel
 
-    keyboard_plugin = get_keyboard_plugin()
+    keyboard_plugin = PanelManager.find_plugin("xkb")
     if not keyboard_plugin:
         return
 
     # Remove plugin
     plugin_id = int(keyboard_plugin.split("-")[-1])
-    xfce4_panel.reset_property(f"/plugins/{keyboard_plugin}", True)
+    xfce4_panel.reset_property(keyboard_plugin, True)
 
     # Remove plugin id from list
     plugin_ids = xfce4_panel.get_arrayv("/panels/panel-1/plugin-ids")
@@ -152,28 +148,23 @@ def remove_keyboard_plugin():
     refresh_panel()
 
 
-def get_keyboard_plugin():
-    for key, value in xfce4_panel.get_properties("/plugins").items():
-        if type(value) is str and "xkb" == value:
-            keyboard_plugin = key.split("/")[2]
-
-            return keyboard_plugin
-
-    return ""
-
-
 def set_keyboard_plugin_place(keyboard_plugin):
     global xfce4_panel
-    if keyboard_plugin == "":
+    if not keyboard_plugin:
         return
 
     plugins = xfce4_panel.get_arrayv("/panels/panel-1/plugin-ids")
     plugin_id = int(keyboard_plugin.split("-")[1])
-    if plugin_id not in plugins:
-        plugins.append(plugin_id)
-    elif plugin_id == plugins[-2]:
+
+    if plugin_id == plugins[-2]:
+        # plugin already in correct place
         return
 
+    # Add plugin if doesn't exist
+    if plugin_id not in plugins:
+        plugins.append(plugin_id)
+
+    # Move plugin to one left
     plugins[-1], plugins[-2] = plugins[-2], plugins[-1]
 
     xfce4_panel.set_arrayv("/panels/panel-1/plugin-ids", plugins)

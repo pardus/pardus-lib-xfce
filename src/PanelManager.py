@@ -10,7 +10,7 @@ xfce4_panel = Xfconf.Channel.new("xfce4-panel")
 
 def find_plugin(name):
     for key, value in xfce4_panel.get_properties("/plugins").items():
-        if type(value) is str and name in value:
+        if type(value) is str and name == value:
             return key
 
     return None
