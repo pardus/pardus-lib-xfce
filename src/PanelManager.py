@@ -7,25 +7,17 @@ from gi.repository import Xfconf
 
 xfce4_panel = Xfconf.Channel.new("xfce4-panel")
 
-plugin = ""
-items = []
 
-
-def _get_actions_plugin():
-    global plugin
-    if plugin != "":
-        return
-
+def find_plugin(name):
     for key, value in xfce4_panel.get_properties("/plugins").items():
-        if type(value) is str and "actions" in value:
-            plugin = key
-            return
+        if type(value) is str and name in value:
+            return key
+
+    return None
 
 
 def get_actions_items():
-    global items
-    _get_actions_plugin()
-
+    plugin = find_plugin("actions")
     items = xfce4_panel.get_string_list(f"{plugin}/items")
     items_obj = {
         "lock-screen": False,
@@ -50,8 +42,7 @@ def get_actions_items():
 def set_actions_item(key, value):
     # key = 'restart', 'shutdown'
     # value = '+' or '-'
-    global items
-
+    plugin = find_plugin("actions")
     items = xfce4_panel.get_string_list(f"{plugin}/items")
 
     changed = False
@@ -68,7 +59,7 @@ def set_actions_item(key, value):
 
 
 def restore_default_actions():
-    global items
+    plugin = find_plugin("actions")
     items = [
         "-lock-screen",
         "-switch-user",
@@ -85,6 +76,17 @@ def restore_default_actions():
     ]
 
     xfce4_panel.set_arrayv(f"{plugin}/items", items)
+
+
+# Startup Icon
+def get_startup_icon():
+    whisker_plugin = find_plugin("whiskermenu")
+    return xfce4_panel.get_string(f"{whisker_plugin}/button-icon")
+
+
+def set_startup_icon(path):
+    whisker_plugin = find_plugin("whiskermenu")
+    return xfce4_panel.set_string(f"{whisker_plugin}/button-icon", path)
 
 
 def restore_default_settings():

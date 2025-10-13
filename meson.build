@@ -21,7 +21,6 @@ py.install_sources(
     'src/ThemeManager.py',
     'src/ThunarManager.py',
     'src/WallpaperManager.py',
-    'src/WhiskerManager.py'
   ],
   subdir: 'libpardus_xfce_tweaks',
 )
