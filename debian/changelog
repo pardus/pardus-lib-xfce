@@ -1,4 +1,4 @@
-libpardus-xfce-tweaks (0.1.0) yirmiuc; urgency=medium
+pardus-lib-xfce (0.1.0) yirmiuc; urgency=medium
 
   * init
   * fix: added debian/compat

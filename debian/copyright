@@ -1,7 +1,7 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: libpardus-xfce-tweaks
+Upstream-Name: pardus-lib-xfce
 Upstream-Contact: Emin Fedar <emin.fedar@pardus.org.tr>
-Source: https://github.com/pardus/libpardus-xfce-tweaks
+Source: https://github.com/pardus/pardus-lib-xfce
 
 
 Files: *
