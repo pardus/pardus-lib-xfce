@@ -120,13 +120,13 @@ def create_keyboard_plugin():
         set_keyboard_plugin_place(keyboard_plugin)
 
     # Display Language Name (not country)
-    xfce4_panel.set_uint(f"/plugins/{keyboard_plugin}/display-name", 1)
+    xfce4_panel.set_uint(f"{keyboard_plugin}/display-name", 1)
 
     # Display text (not flag)
-    xfce4_panel.set_uint(f"/plugins/{keyboard_plugin}/display-type", 2)
+    xfce4_panel.set_uint(f"{keyboard_plugin}/display-type", 2)
 
     # Enable globally (not program-wide)
-    xfce4_panel.set_uint(f"/plugins/{keyboard_plugin}/group-policy", 0)
+    xfce4_panel.set_uint(f"{keyboard_plugin}/group-policy", 0)
 
 
 def remove_keyboard_plugin():
