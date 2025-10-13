@@ -86,7 +86,7 @@ def get_startup_icon():
 
 def set_startup_icon(path):
     whisker_plugin = find_plugin("whiskermenu")
-    return xfce4_panel.set_string(f"{whisker_plugin}/button-icon", path)
+    xfce4_panel.set_string(f"{whisker_plugin}/button-icon", path)
 
 
 def restore_default_settings():
