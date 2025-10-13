@@ -6,12 +6,12 @@ Build-Depends: debhelper (>= 12), meson
 Standards-Version: 4.6.1
 Homepage: https://www.pardus.org.tr
 
-Package: libpardus-domain-joiner
+Package: libpardus-xfce-tweaks
 Architecture: all
 Depends: ${misc:Depends},
          python3 (>=3.5),
          python3-gi,
          gir1.2-glib-2.0,
          gir1.2-xfconf-0
-Description: Core library for Pardus Domain Joiner
- Pardus Domain Joiner GUI and CLI applications depends on this library  
+Description: Core library for Pardus XFCE Tweaks
+ Pardus XFCE Tweaks and XFCE Greeter depends on this library
