@@ -51,6 +51,7 @@ def save_layouts(new_layouts):
     # Save
     keyboard_layout.set_string("/Default/XkbLayout", layouts)
     keyboard_layout.set_string("/Default/XkbVariant", variants)
+    keyboard_layout.set_bool("/Default/XkbDisable", False)
 
 
 def add_layout(new_layout):
