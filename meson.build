@@ -7,12 +7,21 @@ project(
 py = import('python').find_installation()
 
 
-src_files = files(
-  glob('src/*.py')
-)
-
 # Install Python source files
 py.install_sources(
-  src_files
+  [
+    'src/ApplicationManager.py',
+    'src/DatetimeManager.py',
+    'src/FontManager.py',
+    'src/KeyboardManager.py',
+    'src/LocaleManager.py',
+    'src/PanelManager.py',
+    'src/PowerManager.py',
+    'src/ScaleManager.py',
+    'src/ThemeManager.py',
+    'src/ThunarManager.py',
+    'src/WallpaperManager.py',
+    'src/WhiskerManager.py'
+  ],
   subdir: 'libpardus_xfce_tweaks',
 )
