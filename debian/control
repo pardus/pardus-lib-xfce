@@ -2,9 +2,9 @@ Source: pardus-lib-xfce
 Section: utils
 Priority: optional
 Maintainer: Emin Fedar <emin.fedar@pardus.org.tr>
-Build-Depends: debhelper (>= 12), meson
-Standards-Version: 4.6.1
-Homepage: https://www.pardus.org.tr
+Build-Depends: debhelper-compat (= 13), meson
+Standards-Version: 4.7.2
+Homepage: https://github.com/pardus/pardus-lib-xfce
 
 Package: pardus-lib-xfce
 Architecture: all
