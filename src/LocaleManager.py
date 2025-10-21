@@ -36,24 +36,44 @@ def get_default_locale():
 
 
 # Setters
-def enable_locales(locales):
+def _enable_locales(locales):
     # locale should be like this: "tr_TR.UTF-8 UTF-8"
+    # e.g. locales: "tr_TR.UTF-8 UTF-8|en_US.UTF-8 UTF-8" two locales here
 
-    # disable all locales first:
-    subprocess.run("sed -i 's/^ *\\([^#]\\)/# \\1/' /etc/locale.gen", shell=True)
+    locales_list = locales.split("|")
 
-    # remove duplications:
-    subprocess.run(
-        "awk '!seen[$0]++' /etc/locale.gen | sudo tee /etc/locale.gen", shell=True
-    )
+    new_locale_gen_content = ""
 
-    # enable installed ones:
-    subprocess.run(
-        "sed -i 's/^# *\\(" + locales + "\\)/\\1/' /etc/locale.gen", shell=True
-    )
+    with open("/etc/locale.gen", "r") as f:
+        lines = f.readlines()
+
+        for line in lines:
+            # Example line:
+            # Disabled: '# tr_TR.UTF-8 UTF-8'
+            # Enabled:  'tr_TR.UTF-8 UTF-8'
+
+            if line.startswith("#"):
+                locale = line.split("#")[1].strip()
+
+                if locale in locales_list:
+                    new_line = locale + "\n"
+                else:
+                    new_line = line
+
+            else:
+                if line.strip() in locales_list:
+                    new_line = line
+                else:
+                    new_line = "# " + line
+
+            new_locale_gen_content += new_line
+
+    if new_locale_gen_content:
+        with open("/etc/locale.gen", "w") as f:
+            f.write(new_locale_gen_content)
 
 
-def set_default_locale(locale):
+def _set_default_locale(locale):
     # locale should be like this: "tr_TR.UTF-8"
     lc = locale.split(" ")[0]
     subprocess.run(f"localectl set-locale LANG={lc}", shell=True)
@@ -61,11 +81,11 @@ def set_default_locale(locale):
     subprocess.run(f"localectl set-locale LC_CTYPE=en_US.UTF-8", shell=True)
 
 
-def generate_locale():
+def _generate_locale():
     subprocess.run("locale-gen")
 
 
 def save_locale_settings(locales, default_locale):
-    enable_locales(locales)
-    set_default_locale(default_locale)
-    generate_locale()
+    _enable_locales(locales)
+    _set_default_locale(default_locale)
+    _generate_locale()
