@@ -17,10 +17,6 @@ APPLICATIONS = {}
 
 # Startup Applications
 def _get_application_tuple(file):
-    name = ""
-    icon = ""
-    exec = ""
-    categories = ""
     try:
         app = Gio.DesktopAppInfo.new_from_filename(file.path)
         if app:
@@ -34,11 +30,11 @@ def _get_application_tuple(file):
             categories = (
                 app.get_categories() if app.get_categories() is not None else ""
             )
+            return (exec, name, f"{file.path}", icon, categories)
     except Exception as e:
-        print("{}".format(e))
-        print("parse_desktopfile error: {} {}".format(file.name, file.path))
+        pass
 
-    return (exec, name, f"{file.path}", icon, categories)
+    return None
 
 
 def get_startup_applications():
@@ -49,9 +45,12 @@ def get_startup_applications():
         for file in files:
             if file.is_file():
                 if file.name.split(".")[-1] == "desktop":
-                    print(file.name, "is a startup application")
                     app = Gio.DesktopAppInfo.new_from_filename(file.path)
-                    startup_list.append(app)
+                    if app:
+                        print(file.path, "is a startup application")
+                        startup_list.append(app)
+    except TypeError as error:
+        pass
     except FileNotFoundError as error:
         pass
 
