@@ -1,3 +1,23 @@
+pardus-lib-xfce (0.2.0) yirmiuc; urgency=medium
+
+  * fix: PanelManager import in KeyboardManager
+  * fix: KeyboardManager enable on layout change
+  * fix: path of the keyboard plugin
+  * fix: remove return on set_startup
+  * fix: remove globals in KeyboardManager
+  * fix: app detection
+  * fix: locales generation
+  * fix: PanelManager import in KeyboardManager
+  * fix: KeyboardManager enable on layout change
+  * fix: path of the keyboard plugin
+  * fix: remove return on set_startup
+  * fix: remove globals in KeyboardManager
+  * fix: app detection
+  * fix: locales generation
+  * feat!: get_application_tuple -> get_application_info
+
+ -- Emin Fedar <emin.fedar@pardus.org.tr>  Tue, 21 Oct 2025 15:56:22 +0300
+
 pardus-lib-xfce (0.1.0) yirmiuc; urgency=medium
 
   * init
