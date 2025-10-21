@@ -16,9 +16,9 @@ APPLICATIONS = {}
 
 
 # Startup Applications
-def _get_application_tuple(file):
+def get_application_info(filepath):
     try:
-        app = Gio.DesktopAppInfo.new_from_filename(file.path)
+        app = Gio.DesktopAppInfo.new_from_filename(filepath)
         if app:
             name = app.get_name()
             icon = (
@@ -30,25 +30,38 @@ def _get_application_tuple(file):
             categories = (
                 app.get_categories() if app.get_categories() is not None else ""
             )
-            return (exec, name, f"{file.path}", icon, categories)
+            return {
+                "executable": exec,
+                "name": name,
+                "application_file": filepath,
+                "icon": icon,
+                "categories": categories,
+            }
     except Exception as e:
         pass
 
-    return None
+    filename = filepath.split("/")[-1]
+
+    return {
+        "executable": "",
+        "name": filename,
+        "application_file": filepath,
+        "icon": "image-missing",
+        "categories": "",
+    }
 
 
 def get_startup_applications():
-    startup_list = []  # [<Gio.DesktopAppInfo>]
+    startup_list = []  # [{"executable":"", "name":"", "application_file":"", "icon":"", "categories":""}]
 
     try:
         files = os.scandir(STARTUP_PATH)
         for file in files:
             if file.is_file():
                 if file.name.split(".")[-1] == "desktop":
-                    app = Gio.DesktopAppInfo.new_from_filename(file.path)
-                    if app:
-                        print(file.path, "is a startup application")
-                        startup_list.append(app)
+                    print(file.path, "is a startup application")
+                    app_object = get_application_info(file.path)
+                    startup_list.append(app_object)
     except TypeError as error:
         pass
     except FileNotFoundError as error:
@@ -67,15 +80,9 @@ def get_applications_dictionary():
             for file in files:
                 if file.is_file():
                     if file.name.split(".")[-1] == "desktop":
-                        app_tuple = _get_application_tuple(file)
-                        if app_tuple:
-                            applications[app_tuple[1]] = {
-                                "name": app_tuple[1],
-                                "executable": app_tuple[0],
-                                "application_file": app_tuple[2],
-                                "icon": app_tuple[3],
-                                "categories": app_tuple[4],
-                            }
+                        app_info = get_application_info(file.path)
+                        if app_info["executable"]:
+                            applications[app_info["name"]] = app_info
         except FileNotFoundError as error:
             continue
 
