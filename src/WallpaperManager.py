@@ -2,9 +2,29 @@
 
 import os
 import subprocess
-from gi.repository import Xfconf
+import gi
+
+gi.require_version("Gdk", "3.0")
+from gi.repository import Xfconf, Gdk
 
 wallpaper_dir = "/usr/share/backgrounds/"
+desktop = Xfconf.Channel.new("xfce4-desktop")
+
+
+def get_xfconf_screen_monitor_paths():
+    # ["/backdrop/screen0/monitorVirtual-1/workspace0"]
+    final_paths = []
+
+    display = Gdk.Display.get_default()
+    for s in range(display.get_n_screens()):
+        screen = display.get_screen(s)
+
+        for m in range(screen.get_n_monitors()):
+            m_n = screen.get_monitor_plug_name(m)
+
+            final_paths.append(f"/backdrop/screen{s}/monitor{m_n}/workspace0")
+
+    return final_paths
 
 
 def get_wallpapers():
@@ -20,12 +40,12 @@ def get_wallpapers():
 
 
 def set_wallpaper(wallpaper):
-    desktop = Xfconf.Channel.new("xfce4-desktop")
-    properties = desktop.get_properties("/backdrop")
+    monitor_paths = get_xfconf_screen_monitor_paths()
 
-    for p in properties:
-        if "screen" in p and ("last-image" in p or "last-single-image" in p):
-            desktop.set_string(p, wallpaper)
+    # Set wallpaper in all monitors
+    for p in monitor_paths:
+        last_image_path = f"{p}/last-image"
+        desktop.set_string(last_image_path, wallpaper)
 
 
 def get_resolution():
