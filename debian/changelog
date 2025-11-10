@@ -1,3 +1,9 @@
+pardus-lib-xfce (0.2.1) yirmibes; urgency=medium
+
+  * fix: wallpaper can't set on first boot bug
+
+ -- Emin Fedar <emin.fedar@pardus.org.tr>  Mon, 10 Nov 2025 16:44:48 +0300
+
 pardus-lib-xfce (0.2.0) yirmibes; urgency=medium
 
   [ Emin Fedar ]
