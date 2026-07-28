@@ -1,3 +1,5 @@
+import os
+import shutil
 import subprocess
 
 import gi
@@ -89,14 +91,59 @@ def set_startup_icon(path):
     xfce4_panel.set_string(f"{whisker_plugin}/button-icon", path)
 
 
+DEFAULT_PANEL_DIR = "/etc/xdg/pardus/xfce4/panel"
+DEFAULT_PANEL_XML = (
+    "/etc/xdg/pardus/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"
+)
+
+
+def defaults_available():
+    """Whether the packaged default panel configuration is present.
+
+    These files come from pardus-xfce-settings, which is not a declared
+    dependency of this library. Restoring without them would delete the user's
+    configuration and put nothing back.
+    """
+    return os.path.isdir(DEFAULT_PANEL_DIR) and os.path.isfile(DEFAULT_PANEL_XML)
+
+
 def restore_default_settings():
+    """Replace the user's panel configuration with the packaged defaults.
+
+    Raises FileNotFoundError if the defaults are missing, before touching
+    anything the user owns.
+    """
+    if not defaults_available():
+        raise FileNotFoundError(
+            "Default panel configuration not found under /etc/xdg/pardus/xfce4. "
+            "Is pardus-xfce-settings installed?"
+        )
+
+    panel_dir = os.path.expanduser("~/.config/xfce4/panel")
+    xml_path = os.path.expanduser(
+        "~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"
+    )
+
+    # The current configuration is about to be removed and cannot be
+    # reconstructed, so keep a copy next to it.
+    backup_dir = f"{panel_dir}.bak"
+    if os.path.isdir(panel_dir):
+        shutil.rmtree(backup_dir, ignore_errors=True)
+        shutil.copytree(panel_dir, backup_dir, symlinks=True)
+    if os.path.isfile(xml_path):
+        shutil.copy2(xml_path, f"{xml_path}.bak")
+
     xfce4_panel.reset_property("/", True)
+
+    # Chained with && so that a failure stops the sequence instead of carrying
+    # on to the next step; check=True surfaces it to the caller.
     subprocess.run(
-        """xfce4-panel --quit;
-        pkill xfconfd;
-        rm -rf ~/.config/xfce4/panel/* ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml;
-        cp -R /etc/xdg/pardus/xfce4/panel/* ~/.config/xfce4/panel/;
-        cp /etc/xdg/pardus/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml;
-        (xfce4-panel &)""",
+        "xfce4-panel --quit; "
+        "pkill xfconfd; "
+        f'rm -rf "{panel_dir}"/* "{xml_path}" && '
+        f'cp -R "{DEFAULT_PANEL_DIR}"/* "{panel_dir}/" && '
+        f'cp "{DEFAULT_PANEL_XML}" "{xml_path}" && '
+        "(xfce4-panel &)",
         shell=True,
+        check=True,
     )
