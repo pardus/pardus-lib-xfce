@@ -1,3 +1,6 @@
+import os
+import re
+import shutil
 import subprocess
 
 
@@ -74,18 +77,35 @@ def _enable_locales(locales):
 
 
 def _set_default_locale(locale):
-    # locale should be like this: "tr_TR.UTF-8"
-    lc = locale.split(" ")[0]
-    subprocess.run(f"localectl set-locale LANG={lc}", shell=True)
-    # force lc_ctype to en
-    subprocess.run(f"localectl set-locale LC_CTYPE=en_US.UTF-8", shell=True)
+    # locale should be like this: "tr_TR.UTF-8" or "tr_TR.UTF-8 UTF-8"
+    parts = locale.strip().split()
+    if not parts or len(parts) > 2:
+        raise ValueError(f"Invalid locale string: {locale}")
+
+    lc = parts[0]
+    if not re.match(r"^[a-zA-Z0-9][a-zA-Z0-9_@.-]*$", lc):
+        raise ValueError(f"Invalid locale format: {lc}")
+
+    if len(parts) == 2 and not re.match(r"^[a-zA-Z0-9][a-zA-Z0-9_-]*$", parts[1]):
+        raise ValueError(f"Invalid encoding format: {parts[1]}")
+
+    if shutil.which("update-locale"):
+        subprocess.run(
+            ["update-locale", "--no-checks", f"LANG={lc}", "LC_CTYPE=en_US.UTF-8"],
+            check=True,
+        )
+    else:
+        subprocess.run(
+            ["localectl", "set-locale", f"LANG={lc}", "LC_CTYPE=en_US.UTF-8"],
+            check=True,
+        )
 
 
 def _generate_locale():
-    subprocess.run("locale-gen")
+    subprocess.run(["locale-gen"], check=True)
 
 
 def save_locale_settings(locales, default_locale):
     _enable_locales(locales)
-    _set_default_locale(default_locale)
     _generate_locale()
+    _set_default_locale(default_locale)
