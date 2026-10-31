@@ -76,9 +76,9 @@ def _enable_locales(locales):
 def _set_default_locale(locale):
     # locale should be like this: "tr_TR.UTF-8"
     lc = locale.split(" ")[0]
-    subprocess.run(f"localectl set-locale LANG={lc}", shell=True)
+    subprocess.run(["localectl", "set-locale", f"LANG={lc}"])
     # force lc_ctype to en
-    subprocess.run(f"localectl set-locale LC_CTYPE=en_US.UTF-8", shell=True)
+    subprocess.run(["localectl", "set-locale", "LC_CTYPE=en_US.UTF-8"])
 
 
 def _generate_locale():
